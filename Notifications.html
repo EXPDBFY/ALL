@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Notifications</title>
+    <style>
+        /* Modal Styles */
+        #modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+        }
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        #modal button {
+            margin-top: 10px;
+            padding: 8px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Modal Popup -->
+<div id="modal-overlay"></div>
+<div id="modal">
+    <h2>Reminder</h2>
+    <p id="modal-content"></p>
+    <button onclick="closeModal()">Close</button>
+</div>
+
+<script>
+const API_KEY = "AIzaSyBFnsLkiRlzmqT92gaSthwz9rPdeNquvA0";
+const SHEET_ID = "1r7CI_sQ2VvD9XHbkzVkq6jwlpj5TgeWLUrU2nzkrnOA";
+const SHEET_NAME = "MAIN";
+
+let notificationData = {}; // Store notification data
+
+// Function to fetch data from Google Sheets
+async function fetchSheetData() {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!B:E?key=${API_KEY}`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        checkNotifications(data.values);
+    } catch (error) {
+        console.error("Error fetching sheet data:", error);
+    }
+}
+
+// Function to check and trigger notifications
+function checkNotifications(rows) {
+    if (!rows || rows.length === 0) return;
+
+    const today = new Date();
+    const lastMonthSameDay = new Date(today);
+    lastMonthSameDay.setMonth(today.getMonth() - 1);
+
+    const formattedLastMonthDate = lastMonthSameDay.toISOString().split('T')[0];
+
+    rows.forEach(row => {
+        let dateCell = row[0]; // Column B (Dates)
+        let message = row[3];  // Column E (Data)
+
+        if (dateCell && message) {
+            let sheetDate = new Date(dateCell).toISOString().split('T')[0];
+            if (sheetDate === formattedLastMonthDate) {
+                notificationData = { date: sheetDate, message: message };
+                showNotification("Reminder", message);
+            }
+        }
+    });
+}
+
+// Function to show notifications
+function showNotification(title, message) {
+    if (!("Notification" in window)) {
+        alert("This browser does not support desktop notifications.");
+    } else if (Notification.permission === "granted") {
+        let notification = new Notification(title, { body: message });
+
+        // When user clicks the notification, open the modal
+        notification.onclick = () => showModal(notificationData.date, notificationData.message);
+    } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                let notification = new Notification(title, { body: message });
+                notification.onclick = () => showModal(notificationData.date, notificationData.message);
+            }
+        });
+    }
+}
+
+// Function to show the modal
+function showModal(date, message) {
+    document.getElementById("modal-content").innerHTML = `<strong>Date:</strong> ${date}<br><strong>Message:</strong> ${message}`;
+    document.getElementById("modal").style.display = "block";
+    document.getElementById("modal-overlay").style.display = "block";
+}
+
+// Function to close the modal
+function closeModal() {
+    document.getElementById("modal").style.display = "none";
+    document.getElementById("modal-overlay").style.display = "none";
+}
+
+// Run the function every day
+fetchSheetData();
+setInterval(fetchSheetData, 86400000); // Check once per day
+</script>
+
+</body>
+</html>

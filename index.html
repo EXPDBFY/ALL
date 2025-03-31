@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom PIN Input</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f0f0f0;
+    }
+    .pin-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .pin-inputs {
+      display: flex;
+    }
+    .pin-digit {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #ccc;
+      text-align: center;
+      font-size: 16px;
+      margin: 5px;
+      -webkit-text-security: disc;
+      text-security: circles;
+    }
+    .pin-container.error .pin-digit {
+      border: 2px solid red;
+    }
+    .error-message {
+      color: red;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="pin-container">
+    <p class="error-message"></p>
+    <h1>PIN ENTER</h1>
+    <div class="pin-inputs">
+      <input type="text" class="pin-digit" maxlength="1" inputmode="numeric">
+      <input type="text" class="pin-digit" maxlength="1" inputmode="numeric">
+      <input type="text" class="pin-digit" maxlength="1" inputmode="numeric">
+      <input type="text" class="pin-digit" maxlength="1" inputmode="numeric">
+    </div>
+    <h7>If Forget Pin Please Contact Admin </h7>
+  </div>
+  <script>
+    const API_KEY = 'AIzaSyBFnsLkiRlzmqT92gaSthwz9rPdeNquvA0';
+    const SHEET_ID = '1r7CI_sQ2VvD9XHbkzVkq6jwlpj5TgeWLUrU2nzkrnOA';
+    const SHEET_NAME = 'LOOKUP';
+    const RANGE = 'B2:B3';
+
+    let correctPin = "";
+    let redirectUrl = "";
+
+    // Fetch PIN and URL from Google Sheets API
+    async function fetchPinAndUrl() {
+      try {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}!${RANGE}?key=${API_KEY}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.values) {
+          correctPin = data.values[0][0]; // PIN from B2
+          redirectUrl = data.values[1][0]; // URL from B3
+        }
+      } catch (error) {
+        console.error("Error fetching PIN and URL:", error);
+      }
+    }
+
+    fetchPinAndUrl();
+
+    const pinDigits = document.querySelectorAll('.pin-digit');
+    const errorMessage = document.querySelector('.error-message');
+
+    const validatePin = () => {
+      let enteredPin = "";
+      pinDigits.forEach(digit => enteredPin += digit.value);
+
+      if (enteredPin === correctPin) {
+        window.location.href = redirectUrl;
+      } else {
+        errorMessage.textContent = "Incorrect PIN. Please try again.";
+        document.querySelector('.pin-container').classList.add('error');
+        setTimeout(() => {
+          errorMessage.textContent = "";
+          document.querySelector('.pin-container').classList.remove('error');
+        }, 2000);
+      }
+    };
+
+    pinDigits.forEach((digitInput, index) => {
+      digitInput.addEventListener('input', () => {
+        digitInput.value = digitInput.value.replace(/\D/g, '');
+        if (digitInput.value.length === 1 && index < pinDigits.length - 1) {
+          pinDigits[index + 1].focus();
+        }
+        if (index === pinDigits.length - 1 && digitInput.value.length === 1) {
+          validatePin();
+        }
+      });
+
+      digitInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Backspace' && digitInput.value.length === 0 && index > 0) {
+          pinDigits[index - 1].focus();
+          pinDigits[index - 1].value = '';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

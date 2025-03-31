@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expenses</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Daily Expenses</h1>
+  <div class="form-container">
+    <form id="myForm" action="https://script.google.com/macros/s/AKfycbwK212H3EpUcHqlQjZeXTL1UxRTZI9ERPiFJT9xBxf7Wm5QSLCbjwiHhgypjow0TBQT/exec" method="post" enctype="multipart/form-data">
+      <label for="Date">Date:</label>
+      <input type="date" id="Date" name="Date" required aria-label="Date">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Ctg</th>
+            <th>Description</th>
+            <th>Note</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- NEEDS Group -->
+          <tr class="group-header" data-group="needs">
+            <td colspan="4">
+              <span class="arrow">▶</span> NEEDS (Food, Bills, Housing, Transports)
+            </td>
+          </tr>
+          <tr class="needs">
+            <td>
+              <button type="button" class="fav-btn" data-category="Food" onclick="toggleFavorite(this)">Fod</button>
+              <input type="hidden" name="Food_Favorite" value="false">
+            </td>
+            <td><textarea id="Food_Description" name="Food_Description" aria-label="Food Description"></textarea></td>
+            <td><textarea id="Food_Note" name="Food_Note" aria-label="Food Note"></textarea></td>
+            <td><input type="tel" id="Food_Amount" name="Food_Amount" aria-label="Food Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+          <tr class="needs">
+            <td>
+              <button type="button" class="fav-btn" data-category="Bills" onclick="toggleFavorite(this)">Bls</button>
+              <input type="hidden" name="Bills_Favorite" value="false">
+            </td>
+            <td><textarea id="Bills_Description" name="Bills_Description" aria-label="Bills Description"></textarea></td>
+            <td><textarea id="Bills_Note" name="Bills_Note" aria-label="Bills Note"></textarea></td>
+            <td><input type="tel" id="Bills_Amount" name="Bills_Amount" aria-label="Bills Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+          <tr class="needs">
+            <td>
+              <button type="button" class="fav-btn" data-category="Housing" onclick="toggleFavorite(this)">Hsg</button>
+              <input type="hidden" name="Housing_Favorite" value="false">
+            </td>
+            <td><textarea id="Housing_Description" name="Housing_Description" aria-label="Housing Description"></textarea></td>
+            <td><textarea id="Housing_Note" name="Housing_Note" aria-label="Housing Note"></textarea></td>
+            <td><input type="tel" id="Housing_Amount" name="Housing_Amount" aria-label="Housing Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+          <tr class="needs">
+            <td>
+              <button type="button" class="fav-btn" data-category="Transports" onclick="toggleFavorite(this)">Tsp</button>
+              <input type="hidden" name="Transports_Favorite" value="false">
+            </td>
+            <td><textarea id="Transports_Description" name="Transports_Description" aria-label="Transports Description"></textarea></td>
+            <td><textarea id="Transports_Note" name="Transports_Note" aria-label="Transports Note"></textarea></td>
+            <td><input type="tel" id="Transports_Amount" name="Transports_Amount" aria-label="Transports Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+
+          <!-- WANTS Group -->
+          <tr class="group-header" data-group="wants">
+            <td colspan="4">
+              <span class="arrow">▶</span> WANTS (Shopping, Personal Discretionary)
+            </td>
+          </tr>
+          <tr class="wants">
+            <td>
+              <button type="button" class="fav-btn" data-category="Shopping" onclick="toggleFavorite(this)">Spg</button>
+              <input type="hidden" name="Shopping_Favorite" value="false">
+            </td>
+            <td><textarea id="Shopping_Description" name="Shopping_Description" aria-label="Shopping Description"></textarea></td>
+            <td><textarea id="Shopping_Note" name="Shopping_Note" aria-label="Shopping Note"></textarea></td>
+            <td><input type="tel" id="Shopping_Amount" name="Shopping_Amount" aria-label="Shopping Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+          <tr class="wants">
+            <td>
+              <button type="button" class="fav-btn" data-category="Personal_Discretionary" onclick="toggleFavorite(this)">Prl</button>
+              <input type="hidden" name="Personal_Discretionary_Favorite" value="false">
+            </td>
+            <td><textarea id="Personal_Discretionary_Description" name="Personal_Discretionary_Description" aria-label="Personal Discretionary Description"></textarea></td>
+            <td><textarea id="Personal_Discretionary_Note" name="Personal_Discretionary_Note" aria-label="Personal Discretionary Note"></textarea></td>
+            <td><input type="tel" id="Personal_Discretionary_Amount" name="Personal_Discretionary_Amount" aria-label="Personal Discretionary Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+
+          <!-- REVENUE Group -->
+          <tr class="group-header" data-group="revenue">
+            <td colspan="4">
+              <span class="arrow">▶</span> REVENUE (Income, Cashback)
+            </td>
+          </tr>
+          <tr class="revenue">
+            <td>
+              <button type="button" class="fav-btn" data-category="Income" onclick="toggleFavorite(this)">Inc</button>
+              <input type="hidden" name="Income_Favorite" value="false">
+            </td>
+            <td><textarea id="Income_Description" name="Income_Description" aria-label="Income Description"></textarea></td>
+            <td><textarea id="Income_Note" name="Income_Note" aria-label="Income Note"></textarea></td>
+            <td><input type="tel" id="Income_Amount" name="Income_Amount" aria-label="Income Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+          <tr class="revenue">
+            <td>
+              <button type="button" class="fav-btn" data-category="Cashback" onclick="toggleFavorite(this)">Cbk</button>
+              <input type="hidden" name="Cashback_Favorite" value="false">
+            </td>
+            <td><textarea id="Cashback_Description" name="Cashback_Description" aria-label="Cashback Description"></textarea></td>
+            <td><textarea id="Cashback_Note" name="Cashback_Note" aria-label="Cashback Note"></textarea></td>
+            <td><input type="tel" id="Cashback_Amount" name="Cashback_Amount" aria-label="Cashback Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+
+          <!-- LIABILITIES Group -->
+          <tr class="group-header" data-group="liabilities">
+            <td colspan="4">
+              <span class="arrow">▶</span> LIABILITIES (Credit Card, Card Bill, S&G, Debt)
+            </td>
+          </tr>
+          <tr class="liabilities">
+            <td>
+              <button type="button" class="fav-btn" data-category="Credit_Card" onclick="toggleFavorite(this)">CCP</button>
+              <input type="hidden" name="Credit_Card_Favorite" value="false">
+            </td>
+            <td><input type="tel" id="Credit_Card_Description" name="Credit_Card_Description" aria-label="Credit Card Description" pattern="[0-9]{4}" maxlength="4" placeholder="0000" inputmode="numeric">
+            </td>
+            <td><textarea id="Credit_Card_Note" name="Credit_Card_Note" aria-label="Credit Card Note"></textarea></td>
+            <td><input type="tel" id="Credit_Card_Amount" name="Credit_Card_Amount" aria-label="Credit Card Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+          <tr class="liabilities">
+            <td>
+              <button type="button" class="fav-btn" data-category="Card_Bill" onclick="toggleFavorite(this)">CCB</button>
+              <input type="hidden" name="Card_Bill_Favorite" value="false">
+            </td>
+            <td><input type="tel" id="Card_Bill_Description" name="Card_Bill_Description" aria-label="Card Bill Description" pattern="[0-9]{4}" maxlength="4" placeholder="0000" inputmode="numeric">
+            </td>
+            <td><textarea id="Card_Bill_Note" name="Card_Bill_Note" aria-label="Card Bill Note"></textarea></td>
+            <td><input type="tel" id="Card_Bill_Amount" name="Card_Bill_Amount" aria-label="Card Bill Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+          <tr class="liabilities">
+            <td>
+              <button type="button" class="fav-btn" data-category="S&G" onclick="toggleFavorite(this)">S&G</button>
+              <input type="hidden" name="S&G_Favorite" value="false">
+            </td>
+            <td><textarea id="S&G_Description" name="S&G_Description" aria-label="S&G Description"></textarea></td>
+            <td><textarea id="S&G_Note" name="S&G_Note" aria-label="S&G Note"></textarea></td>
+            <td><input type="tel" id="S&G_Amount" name="S&G_Amount" aria-label="S&G Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+          <tr class="liabilities">
+            <td>
+              <button type="button" class="fav-btn" data-category="Debt" onclick="toggleFavorite(this)">Dbt</button>
+              <input type="hidden" name="Debt_Favorite" value="false">
+            </td>
+            <td><textarea id="Debt_Description" name="Debt_Description" aria-label="Debt Description"></textarea></td>
+            <td><textarea id="Debt_Note" name="Debt_Note" aria-label="Debt Note"></textarea></td>
+            <td><input type="tel" id="Debt_Amount" name="Debt_Amount" aria-label="Debt Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+
+          <!-- SAVINGS & INVESTMENTS Group -->
+          <tr class="group-header" data-group="savings">
+            <td colspan="4">
+              <span class="arrow">▶</span> SAVINGS & INVESTMENTS (Invest, Returns)
+            </td>
+          </tr>
+          <tr class="savings">
+            <td>
+              <button type="button" class="fav-btn" data-category="Invest" onclick="toggleFavorite(this)">Ivt</button>
+              <input type="hidden" name="Invest_Favorite" value="false">
+            </td>
+            <td><textarea id="Invest_Description" name="Invest_Description" aria-label="Invest Description"></textarea></td>
+            <td><textarea id="Invest_Note" name="Invest_Note" aria-label="Invest Note"></textarea></td>
+            <td><input type="tel" id="Invest_Amount" name="Invest_Amount" aria-label="Invest Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+          <tr class="savings">
+            <td>
+              <button type="button" class="fav-btn" data-category="Returns" onclick="toggleFavorite(this)">Rts</button>
+              <input type="hidden" name="Returns_Favorite" value="false">
+            </td>
+            <td><textarea id="Returns_Description" name="Returns_Description" aria-label="Returns Description"></textarea></td>
+            <td><textarea id="Returns_Note" name="Returns_Note" aria-label="Returns Note"></textarea></td>
+            <td><input type="tel" id="Returns_Amount" name="Returns_Amount" aria-label="Returns Amount" placeholder="0.00" step="0.01"></td>
+          </tr>
+
+      <!-- OPENINGS Group -->
+      <tr class="group-header" data-group="openings">
+          <td colspan="4">
+            <span class="arrow">▶</span> OPENINGS (OC-Revenue, OC-Savings, OC-Liabilities)
+          </td>
+        </tr>
+        <tr class="openings">
+          <td>
+            <button type="button" class="fav-btn" data-category="OC-Revenue" onclick="toggleFavorite(this)">Rev</button>
+            <input type="hidden" name="OC-Revenue_Favorite" value="false">
+          </td>
+          <td><textarea id="OC-Revenue_Description" name="OC-Revenue_Description" aria-label="OC-Revenue Description"></textarea></td>
+          <td><textarea id="OC-Revenue_Note" name="OC-Revenue_Note" aria-label="OC-Revenue Note"></textarea></td>
+          <td><input type="tel" id="OC-Revenue_Amount" name="OC-Revenue_Amount" aria-label="OC-Revenue Amount" placeholder="0.00" step="0.01"></td>
+        </tr>
+        <tr class="openings">
+          <td>
+            <button type="button" class="fav-btn" data-category="OC-Savings" onclick="toggleFavorite(this)">Sav</button>
+            <input type="hidden" name="OC-Savings_Favorite" value="false">
+          </td>
+          <td><textarea id="OC-Savings_Description" name="OC-Savings_Description" aria-label="OC-Savings Description"></textarea></td>
+          <td><textarea id="OC-Savings_Note" name="OC-Savings_Note" aria-label="OC-Savings Note"></textarea></td>
+          <td><input type="tel" id="OC-Savings_Amount" name="OC-Savings_Amount" aria-label="OC-Savings Amount" placeholder="0.00" step="0.01"></td>
+        </tr>
+        <tr class="openings">
+          <td>
+            <button type="button" class="fav-btn" data-category="OC-Liabilities" onclick="toggleFavorite(this)">Lbs</button>
+            <input type="hidden" name="OC-Liabilities_Favorite" value="false">
+          </td>
+          <td><textarea id="OC-Liabilities_Description" name="OC-Liabilities_Description" aria-label="OC-Liabilities Description"></textarea></td>
+          <td><textarea id="OC-Liabilities_Note" name="OC-Liabilities_Note" aria-label="OC-Liabilities Note"></textarea></td>
+          <td><input type="tel" id="OC-Liabilities_Amount" name="OC-Liabilities_Amount" aria-label="OC-Liabilities Amount" placeholder="0.00" step="0.01"></td>
+        </tr>
+
+      </tbody>
+    </table>
+
+      <!-- Attachment input above submit button -->
+      <label for="attachment">Attachment:</label>
+      <input type="file" id="attachment" name="attachment" accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.png,.jpg,.jpeg,.txt,.zip,.rar" />
+<div class="button-container">
+      <button type="button" class="editButton" onclick="handleEdit()">Edit</button>
+      <input class="submitButton" type="submit" value="Submit" />
+</div>
+    </form>
+  </div>
+
+  <!-- Modal HTML -->
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <p id="modalNote"></p>
+    </div>
+  </div>
+  
+  <script src="form.js"></script>
+</body>
+	</html>

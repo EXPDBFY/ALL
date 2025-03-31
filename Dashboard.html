@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Sheets Data</title>
+   <style>
+    body {
+	  font-family: Arial, sans-serif;
+	  margin: 0;
+	  padding: 0;
+	  background-color: #f4f4f4;
+	  color: #333;
+	}
+
+	h1 {
+	  text-align: center;
+	  color: #444;
+	  margin-top: 20px;
+	}
+    
+    /* Header Section (Audit Controls + Title) */
+    .header-container {
+	  max-width: 900px;
+      margin: 20px auto;
+	  padding: 2px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .audit-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-title {
+      flex-basis: 100%;
+      text-align: center;
+      font-size: 0.8em;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    
+    /* Table Styles */
+    table {
+      max-width: 900px;
+      margin: 20px auto;
+	  padding: 2px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+	}
+    th, td {
+      border: 1px solid #000;
+      padding: 10px;
+      text-align: center;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    th {
+      background-color: #ffcc00;
+      font-weight: bold;
+    }
+    
+    /* Spinner Animation for Posting */
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3498db;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Error Message Styling */
+    #errorMessage {
+      color: red;
+      font-weight: bold;
+      margin: 10px 0;
+      animation: shake 0.3s ease-in-out;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
+    }
+    
+    /* Media Queries for Mobile */
+    @media (max-width: 1600px) {
+      .container {
+        padding: 0 10px;
+      }
+      table {
+        font-size: 14px;
+      }
+      th, td {
+        padding: 8px;
+      }
+    }
+    
+    @media (max-width: 720px) {
+      body {
+        padding: 10px;
+      }
+      .header-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      table {
+        font-size: 12px;
+      }
+      th, td {
+        padding: 5px;
+      }
+      .audit-controls input,
+      .audit-controls button {
+        font-size: 12px;
+      }
+      .header-title {
+        font-size: 1.4em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header Section: Audit Controls and Title -->
+    <div class="header-container">
+      <div class="audit-controls">
+        <input type="date" id="auditDate" />
+        <label>
+          <input type="checkbox" id="auditCheckbox" /> DONE
+        </label>
+        <button id="auditPostButton">POST</button>
+        <span id="auditStatus" style="font-weight: bold;"></span>
+      </div>
+      <h2 class="header-title">Google Sheets Data</h2>
+    </div>
+    
+    <p id="errorMessage" style="display: none;"></p>
+    
+    <table id="sheetTable"></table>
+    
+    <script>
+      // Set the date picker's value to today's date (format: yyyy-mm-dd)
+      document.addEventListener('DOMContentLoaded', function() {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('auditDate').value = today;
+      });
+      
+      // Replace with your deployed Google Apps Script URL that handles posting data
+      const GS_POST_URL = 'https://script.google.com/macros/s/AKfycbwK212H3EpUcHqlQjZeXTL1UxRTZI9ERPiFJT9xBxf7Wm5QSLCbjwiHhgypjow0TBQT/exec';
+      
+      document.getElementById('auditPostButton').addEventListener('click', async function() {
+        var auditDate = document.getElementById('auditDate').value;
+        var isDone = document.getElementById('auditCheckbox').checked;
+        var statusElem = document.getElementById('auditStatus');
+        var errorMessage = document.getElementById('errorMessage');
+      
+        // Reset error message
+        errorMessage.style.display = 'none';
+        errorMessage.textContent = '';
+      
+        if (!isDone) {
+          errorMessage.textContent = "Please check DONE to post.";
+          errorMessage.style.display = 'block';
+          return;
+        }
+        
+        // Show posting loading animation
+        statusElem.innerHTML = '<span class="spinner"></span> Posting...';
+        
+        // Build the form data to send to GS with action=postDone
+        var formData = new FormData();
+        formData.append('action', 'postDone');
+        formData.append('Date', auditDate);
+      
+        try {
+          const response = await fetch(GS_POST_URL, {
+            method: 'POST',
+            body: formData
+          });
+          const result = await response.text();
+          statusElem.textContent = result;
+        } catch (err) {
+          statusElem.textContent = '';
+          errorMessage.textContent = "Error posting DONE message.";
+          errorMessage.style.display = 'block';
+          console.error(err);
+        }
+      });
+      
+      // --- Google Sheets Data Fetch and Table Render ---
+      const API_KEY = 'AIzaSyBFnsLkiRlzmqT92gaSthwz9rPdeNquvA0';
+      const SHEET_ID = '1r7CI_sQ2VvD9XHbkzVkq6jwlpj5TgeWLUrU2nzkrnOA';
+      const SHEET_NAME = 'CT';
+      const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?includeGridData=true&key=${API_KEY}`;
+      const REFRESH_INTERVAL = 2000; // 2 seconds
+      
+      async function fetchSheetData() {
+        try {
+          const response = await fetch(URL);
+          if (!response.ok) {
+            throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+          }
+          const data = await response.json();
+          if (!data.sheets) {
+            throw new Error('Invalid sheet ID or no data available');
+          }
+          const sheet = data.sheets.find(s => s.properties.title === SHEET_NAME);
+          if (!sheet) {
+            throw new Error('Sheet name not found');
+          }
+          const gridData = sheet.data[0];
+          const merges = sheet.merges || [];
+          const columnMetadata = gridData.columnMetadata;
+          renderTable(gridData, merges, columnMetadata);
+          // Hide error message if successful
+          document.getElementById('errorMessage').style.display = 'none';
+        } catch (error) {
+          document.getElementById('errorMessage').textContent = error.message;
+          document.getElementById('errorMessage').style.display = 'block';
+          console.error('Error fetching data:', error);
+        }
+      }
+      
+      function renderTable(gridData, merges, columnMetadata) {
+        const table = document.getElementById('sheetTable');
+        table.innerHTML = '';
+        const { rowData } = gridData || {};
+        if (!rowData) return;
+      
+        // Build maps for merged cells.
+        const mergedCellsMap = new Map();
+        const skipCells = new Set();
+        merges.forEach(({ startRowIndex, endRowIndex, startColumnIndex, endColumnIndex }) => {
+          const rowspan = (endRowIndex || startRowIndex + 1) - startRowIndex;
+          const colspan = (endColumnIndex || startColumnIndex + 1) - startColumnIndex;
+          mergedCellsMap.set(`${startRowIndex}-${startColumnIndex}`, { rowspan, colspan });
+          for (let r = startRowIndex; r < (endRowIndex || startRowIndex + 1); r++) {
+            for (let c = startColumnIndex; c < (endColumnIndex || startColumnIndex + 1); c++) {
+              if (!(r === startRowIndex && c === startColumnIndex)) {
+                skipCells.add(`${r}-${c}`);
+              }
+            }
+          }
+        });
+      
+        rowData.forEach((row, rowIndex) => {
+          const tr = document.createElement('tr');
+          (row.values || []).forEach((cell, colIndex) => {
+            if (skipCells.has(`${rowIndex}-${colIndex}`)) return;
+            const cellElement = document.createElement('td');
+            cellElement.textContent = cell.formattedValue || '';
+            if (mergedCellsMap.has(`${rowIndex}-${colIndex}`)) {
+              const mergeData = mergedCellsMap.get(`${rowIndex}-${colIndex}`);
+              cellElement.rowSpan = mergeData.rowspan;
+              cellElement.colSpan = mergeData.colspan;
+            }
+            applyCellFormatting(cellElement, cell.effectiveFormat);
+            if (columnMetadata && columnMetadata[colIndex]) {
+              applyColumnWidth(cellElement, columnMetadata[colIndex]);
+            }
+            tr.appendChild(cellElement);
+          });
+          table.appendChild(tr);
+        });
+      }
+      
+      function applyCellFormatting(element, format) {
+        if (!format) return;
+        const { textFormat, backgroundColor } = format;
+        if (textFormat) {
+          if (textFormat.bold) element.style.fontWeight = 'bold';
+          if (textFormat.italic) element.style.fontStyle = 'italic';
+          if (textFormat.underline) element.style.textDecoration = 'underline';
+          if (textFormat.foregroundColor) {
+            element.style.color = rgbColor(textFormat.foregroundColor);
+          }
+        }
+        if (backgroundColor) {
+          element.style.backgroundColor = rgbColor(backgroundColor);
+        }
+      }
+      
+      function applyColumnWidth(element, columnMeta) {
+        if (columnMeta && columnMeta.pixelSize) {
+          element.style.width = `${columnMeta.pixelSize}px`;
+        }
+      }
+      
+      function rgbColor(color) {
+        const red = Math.floor((color.red || 0) * 255);
+        const green = Math.floor((color.green || 0) * 255);
+        const blue = Math.floor((color.blue || 0) * 255);
+        return `rgb(${red}, ${green}, ${blue})`;
+      }
+      
+      fetchSheetData();
+      setInterval(fetchSheetData, REFRESH_INTERVAL);
+    </script>
+  </div>
+</body>
+</html>
